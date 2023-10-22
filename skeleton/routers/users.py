@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Response, Query
-from skeleton.services import user_service
-from datetime import date
+from services import user_service
 
 
 
@@ -19,17 +18,13 @@ def login(username: str = Query(),password: str = Query()):
 
 
 @users_router.post('/register', tags=["Signup"])
-def register(email: str  = Query(), 
-             username: str = Query(), 
+def register(username: str = Query(), 
              password: str = Query(), 
-             date_of_birth: date = Query(), 
-             gender: str = Query()):
-
-    if user_service.check_email_exist(email):
-        return Response(status_code=400, content=f'Email is already taken!')
+             email: str = Query()):
+    role = "User"
 
     if user_service.check_username_exist(username):
         return Response(status_code=400, content=f'Username is already taken!')
     else:
-        user = user_service.create_user(email, username, password,date_of_birth,gender)
+        user = user_service.create_user(username, password, email, role)
         return user

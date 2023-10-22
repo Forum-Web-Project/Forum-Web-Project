@@ -14,7 +14,7 @@ def create_token(user: User) -> str:
 
 def is_authenticated(token: str) -> bool:
     return any(read_query(
-        'SELECT 1 FROM user WHERE idUser = ? and nickname = ?',
+        'SELECT 1 FROM users WHERE id = ? and username = ?',
         token.split(_SEPARATOR)))
 
 
@@ -25,12 +25,12 @@ def from_token(token: str) -> User | None:
 
 def find_by_username(nickname: str) -> User | None:
     data = read_query(
-        'SELECT * FROM user WHERE nickname = ?',
+        'SELECT * FROM users WHERE username = ?',
         (nickname,))
 
     return next((User.from_query_result(*row) for row in data), None)
 
-def create_user(username: str, password: str, email: str, role="User") -> User | None:
+def create_user(username: str, password: str, email: str, role: str) -> User | None:
     # password = _hash_password(password)
 
         generated_id = insert_query(
@@ -38,3 +38,12 @@ def create_user(username: str, password: str, email: str, role="User") -> User |
             (username, password, email, role))
 
         return User(id=generated_id, username=username, password="", email=email, role=role)
+
+def check_username_exist(nickname:str) -> bool:
+
+    data = read_query(
+        'SELECT username FROM users WHERE username = ?',
+        (nickname,)
+    )
+
+    return bool(data)

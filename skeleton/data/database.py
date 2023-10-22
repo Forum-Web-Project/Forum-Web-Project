@@ -4,10 +4,10 @@ from mariadb.connections import Connection
 def _get_connection() -> Connection:
     return connect(
         user='root',
-        password= "vashata si parola",
+        password= "202018bby",
         host='localhost',
         port=3306,
-        database='forum_db'
+        database='web project'
     )
 
 def read_query(sql: str, sql_params=()):
