@@ -6,7 +6,7 @@ from services import user_service
 users_router = APIRouter(prefix='/users')
 
 
-@users_router.post('/login', tags=["Signup"])
+@users_router.post('/login', tags=["Login"])
 def login(username: str = Query(),password: str = Query()):
     user = user_service.try_login(username, password)
 
