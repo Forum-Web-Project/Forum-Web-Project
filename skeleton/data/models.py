@@ -31,3 +31,10 @@ class Topic(BaseModel):
     text: str
     users_id: int
     
+    @classmethod
+    def from_query_result(cls, id, title, text, users_id):
+        return cls(
+            id=id,
+            title=title,
+            text=text,
+            users_id=users_id)

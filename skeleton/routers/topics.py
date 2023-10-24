@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response, Header, HTTPException
 from services import user_service, topic_service
 from data.models import Topic
+from common.responses import BadRequest, NotFound
 
 
 topics_router = APIRouter(prefix='/topic')
@@ -18,3 +19,12 @@ def create_topic(data: Topic, token: str = Header()):
     else:
         raise HTTPException(status_code=401)
     
+
+@topics_router.get('/{id}')
+def get_topic_by_id(id: int):
+    topic = topic_service.get_by_id(id)
+
+    if topic is None:
+        return NotFound()
+    else:
+        return topic
