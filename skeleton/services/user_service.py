@@ -47,3 +47,13 @@ def check_username_exist(nickname:str) -> bool:
     )
 
     return bool(data)
+    
+
+def check_topic_exist(title:str) -> bool:
+
+    data = read_query(
+        'SELECT title FROM topics WHERE title = ?',
+        (title,)
+    )
+
+    return bool(data)
