@@ -17,3 +17,4 @@ def create_topic(data: Topic, token: str = Header()):
             return topic
     else:
         raise HTTPException(status_code=401)
+    
