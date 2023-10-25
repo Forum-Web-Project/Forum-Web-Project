@@ -13,6 +13,20 @@ def check_topic_exist(title:str) -> bool:
 
     return bool(data)
 
+def all(search: str = None):
+    if search is None:
+        data = read_query(
+            '''SELECT id, title, text, users_id
+            FROM topics''')
+    else:
+        data = read_query(
+            '''SELECT id, title, text, users_id
+               FROM topics 
+               WHERE title LIKE ?''', (f'%{search}%',))
+
+    return (Topic.from_query_result(*row) for row in data)
+
+
 
 def create_topic(title: str, text: str, users_id: int) -> Topic | None:
     # password = _hash_password(password)
