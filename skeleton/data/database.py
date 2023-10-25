@@ -4,7 +4,7 @@ from mariadb.connections import Connection
 def _get_connection() -> Connection:
     return connect(
         user='root',
-        password= "some pass",
+        password= "202018bby",
         host='localhost',
         port=3306,
         database='web project'

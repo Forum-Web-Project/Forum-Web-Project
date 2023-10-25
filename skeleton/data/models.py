@@ -29,14 +29,14 @@ class LoginData(BaseModel):
 class Topic(BaseModel):
     title: str
     text: str
-    users_id: int
-    categories_id: int
+    username: str
+    category_id: int
     
-    @classmethod
-    def from_query_result(cls, id, title, text, users_id, categories_id):
-        return cls(
-            id=id,
-            title=title,
-            text=text,
-            users_id=users_id,
-            categories_id=categories_id)
+    # @classmethod
+    # def from_query_result(cls, id, title, text, users_id, categories_id):
+    #     return cls(
+    #         id=id,
+    #         title=title,
+    #         text=text,
+    #         users_id=users_id,
+    #         categories_id=categories_id)

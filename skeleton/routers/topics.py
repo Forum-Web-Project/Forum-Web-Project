@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Response, Header, HTTPException
+from fastapi import APIRouter, Response, Header, HTTPException, Query
 from services import user_service, topic_service
 from data.models import Topic
 from common.responses import BadRequest, NotFound
+from common.auth import get_user_or_raise_401
 
 
 topics_router = APIRouter(prefix='/topic')
@@ -31,15 +32,17 @@ def get_topic_by_id(id: int):
         return topic
     
 
-@topics_router.post('/', tags=["Create topic"])
-def create_topic(data: Topic, token: str = Header()):
-    if user_service.is_authenticated(token):
+@topics_router.post("/create_topic", tags=["Create Topic"])
+def create_topic(x_token: str = Header(),
+                title: str  = Query(), 
+                text: str = Query(),
+                username: str = Query(),
+                category_id: int = Query()
+            ):
+    user = get_user_or_raise_401(x_token)
 
-        if topic_service.check_topic_exist(data.title):
-            return Response(status_code=400, content=f'Topic with this name exist!')
-        else:
-            topic = topic_service.create_topic(data.title, data.text, data.users_id, data.categories_id)
-            return topic
+    if topic_service.check_topic_exists(title):
+        return Response(status_code=400, content=f'Topic with such title already exists!')
     else:
-        raise HTTPException(status_code=401)
-    
+        result = topic_service.create_topic(title, text, username, category_id)
+        return result
