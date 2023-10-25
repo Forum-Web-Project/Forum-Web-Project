@@ -40,3 +40,16 @@ class Topic(BaseModel):
     #         text=text,
     #         users_id=users_id,
     #         categories_id=categories_id)
+
+class Category(BaseModel):
+    name: str
+
+    topics: list = []
+
+    
+    @classmethod
+    def from_query_result(cls, id, name, topics=None):
+        return cls(
+            id=id,
+            name=name,
+            topics=topics or [])

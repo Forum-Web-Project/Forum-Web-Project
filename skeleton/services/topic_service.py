@@ -30,11 +30,11 @@ def sort(topics: list[Topic], *, attribute='users_id', reverse=False):
 def all(search: str = None):
     if search is None:
         data = read_query(
-            '''SELECT id, title, text, users_id
+            '''SELECT id, title, text, users_id, categories_id
             FROM topics''')
     else:
         data = read_query(
-            '''SELECT id, title, text, users_id
+            '''SELECT id, title, text, users_id, categories_id
                FROM topics 
                WHERE title LIKE ?''', (f'%{search}%',))
 
@@ -72,7 +72,7 @@ def create_topic(title: str, text: str, username: str, category_id: int) -> Topi
 
 def get_by_id(id: int):
     data = read_query(
-        '''SELECT id, title, text, users_id
+        '''SELECT id, title, text, users_id, categories_id
             FROM topics 
             WHERE id = ?''', (id,))
 
