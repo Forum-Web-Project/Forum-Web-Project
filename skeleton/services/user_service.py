@@ -48,4 +48,14 @@ def check_username_exist(nickname:str) -> bool:
 
     return bool(data)
     
+def get_nickname_from_token(token: str) -> User | None:
+    _, nickname = token.split(_SEPARATOR)
 
+    return nickname
+
+def find_username_by_id(id: int):
+     data = read_query(
+          "SELECT username FROM users WHERE id = ?",
+          (id,)
+    )
+     return data[0][0]

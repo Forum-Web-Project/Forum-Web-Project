@@ -27,20 +27,19 @@ class LoginData(BaseModel):
 
 
 class Topic(BaseModel):
-    id: int
     title: str
     text: str
     username: str
-    categories_id: int
+    category_id: int
     
-    # @classmethod
-    # def from_query_result(cls, id, title, text, users_id, categories_id):
-    #     return cls(
-    #         id=id,
-    #         title=title,
-    #         text=text,
-    #         users_id=users_id,
-    #         categories_id=categories_id)
+    @classmethod
+    def from_query_result(cls, id, title, text, users_id, categories_id):
+        return cls(
+            id=id,
+            title=title,
+            text=text,
+            users_id=users_id,
+            categories_id=categories_id)
 
 class AllCategories(BaseModel):
     id: int
@@ -59,29 +58,12 @@ class CategoryByID(BaseModel):
     name: str
     is_private: str
     topics: list = []
+
     
     @classmethod
-    def from_query_result(cls, id, name, is_private, topics):
+    def from_query_result(cls, id, name, is_private, topics=None):
         return cls(
             id=id,
             name=name,
             is_private=is_private,
             topics=topics or [])
-    
-
-
-class TopicForCategory(BaseModel):
-    id: int
-    title: str
-    text: str
-    users_id: int
-    categories_id: int
-    
-    @classmethod
-    def from_query_result(cls, id, title, text, users_id, categories_id):
-        return cls(
-            id=id,
-            title=title,
-            text=text,
-            users_id=users_id,
-            categories_id=categories_id)

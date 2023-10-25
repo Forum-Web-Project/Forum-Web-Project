@@ -1,31 +1,47 @@
-from fastapi import APIRouter, Response, Header, HTTPException
-from services import category_service
-from data.models import AllCategories
+from fastapi import APIRouter, Response, Header, HTTPException, Query
+from services import category_service, topic_service
 from common.responses import BadRequest, NotFound
 
 
-category_router = APIRouter(prefix='/category')
+category_router = APIRouter(prefix='/category', tags=['Categories'])
 
 
-@category_router.get('/', response_model=list[AllCategories])
+@category_router.get('/', description="Get All Categories (Sorting name by ascending and descending [asc/desc])")
 def get_categories(
-    sort: str | None = None,
+    sort: str = Query(default="asc"),
     search: str | None = None
 ):
-    result = category_service.all(search)
-
-    if sort and (sort == 'asc' or sort == 'desc'):
-        return category_service.sort(result, reverse=sort == 'desc')
+    if search:
+        categories = category_service.get_categories_by_name(search)
+    elif sort:
+        categories = category_service.sort_categories(sort)
     else:
-        return result
+        categories = category_service.read_categories()
+
+    result = []
+
+    for data in categories:
+        category_dict = {
+            "id": data[0],
+            "name": data[1],
+            "is_private": data[2],
+        }
+        result.append(category_dict)
+    return result
 
 
+@category_router.get('/{name}', description="Get Category By Name And All Of Its Topics")
+def get_category_by_name(name: str):
+    id = category_service.get_category_id_by_name(name)
+    category_data = category_service.find_category_by_id(id)
 
-@category_router.get('/{id}')
-def get_category_by_id(id: int):
-    category = category_service.get_by_id(id)
+    if not category_data:
+        return Response(status_code=400, content='No such category!')
 
-    if category is None:
-        return NotFound()
-    else:
-        return category
+    category_dict = {
+            "id": category_data[0],
+            "name": category_data[1],
+            "is_private": category_data[2],
+            "topics": topic_service.get_topics_by_category_id(category_data[0])
+        }
+    return category_dict

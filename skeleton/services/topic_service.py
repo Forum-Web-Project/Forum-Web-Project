@@ -4,8 +4,6 @@ from services import category_service
 from fastapi import Response
 
 
-
-
 def check_topic_exist(title:str) -> bool:
 
     data = read_query(
@@ -16,37 +14,13 @@ def check_topic_exist(title:str) -> bool:
     return bool(data)
 
 
-
-def sort(topics: list[Topic], *, attribute='users_id', reverse=False):
-    if attribute == 'users_id':
-        def sort_fn(t: Topic): return t.users_id
-    elif attribute == 'category_id':
-        def sort_fn(t: Topic): return t.category_id
-    else:
-        def sort_fn(t: Topic): return t.id
-
-    return sorted(topics, key=sort_fn, reverse=reverse)
-
-
-def all(search: str = None):
-    if search is None:
-        data = read_query(
-            '''SELECT id, title, text, users_id, categories_id
-            FROM topics''')
-    else:
-        data = read_query(
-            '''SELECT id, title, text, users_id, categories_id
-               FROM topics 
-               WHERE title LIKE ?''', (f'%{search}%',))
-
-    return (Topic.from_query_result(*row) for row in data)
-
 def find_id_by_username(nickname):
     result = read_query(
          'SELECT id FROM users WHERE username = ?',
          (nickname,)
     )
     return result
+
 
 def check_topic_exists(title: str) -> bool:
 
@@ -56,12 +30,10 @@ def check_topic_exists(title: str) -> bool:
         )
         return bool(data)
 
+
 def create_topic(title: str, text: str, username: str, category_id: int) -> Topic| None:
-    # password = _hash_password(password)
     author_id = find_id_by_username(username)
     real_author_id = author_id[0][0]
-    category_does_exist = ""
-    # # found_category = category_view_service.check_category_exists(category_name)
     if not category_service.check_category_exists(category_id):
         return Response(status_code=400, content="No such category!")
     generated_id = insert_query(
@@ -78,3 +50,48 @@ def get_by_id(id: int):
             WHERE id = ?''', (id,))
 
     return next((Topic.from_query_result(*row) for row in data), None)
+
+
+def find_topic_by_id(id: int):
+    data = read_query(
+        "SELECT * FROM topics WHERE id = ?",
+        (id,)
+    )
+    if data:
+        return data[0]
+    else:
+        return None
+
+
+def read_topics():
+    data = read_query('SELECT * FROM topics')
+    return data
+
+
+def get_topics_by_title(title_search: str):
+    data = read_query(
+        'SELECT * FROM topics WHERE title LIKE ?',
+        (f"%{title_search}%",)
+    )
+
+    return data
+
+
+def sort_topics(requirement: str):
+    order_by = ''
+    if requirement == "lowest":
+        order_by = 'id ASC'
+    elif requirement == "highest":
+        order_by = 'id DESC'
+
+    data = read_query(f'SELECT * FROM topics ORDER BY {order_by}')
+
+    return data
+
+def get_topics_by_category_id(id: int):
+    data = read_query(
+        "SELECT * FROM topics WHERE categories_id = ?",
+        (id,)
+    )
+    topics = [{'title': row[1], 'text': row[2], 'users_id': row[3], 'up_vote': row[4], 'down_vote': row[5], 'categories_id': row[6]} for row in data]
+    return {"category": category_service.get_category_name_by_id(id), "topics": topics}
