@@ -1,4 +1,4 @@
-from data.models import Topic, AllCategories, CategoryByID
+from data.models import Topic, AllCategories, CategoryByID, TopicForCategory
 from data.database import read_query, insert_query
 
 
@@ -36,7 +36,7 @@ def get_by_id(id: int):
 
     return CategoryByID.from_query_result(
         *category_raw_data[0],
-        [Topic.from_query_result(*row) for row in topics_raw_data])
+        [TopicForCategory.from_query_result(*row) for row in topics_raw_data])
 
 def read_categories():
 
