@@ -50,3 +50,5 @@ def check_category_exists(id: int):
         'SELECT id FROM categories WHERE id = ?',
         (id,)
     )
+
+    return bool(data)

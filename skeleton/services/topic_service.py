@@ -1,6 +1,7 @@
 from data.database import read_query,insert_query
 from data.models import Topic
 from services import category_service
+from fastapi import Response
 
 
 
@@ -61,13 +62,13 @@ def create_topic(title: str, text: str, username: str, category_id: int) -> Topi
     real_author_id = author_id[0][0]
     category_does_exist = ""
     # # found_category = category_view_service.check_category_exists(category_name)
-    if category_service.check_category_exists(category_id):
-        category_does_exist = category_id
+    if not category_service.check_category_exists(category_id):
+        return Response(status_code=400, content="No such category!")
     generated_id = insert_query(
     'INSERT INTO topics(title, text, users_id, up_vote, down_vote, categories_id) VALUES (?,?,?,?,?,?)',
     (title, text, real_author_id, 0, 0, category_id))
 
-    return Topic(title=title, text=text, username=username, category_id=category_does_exist)
+    return Topic(title=title, text=text, username=username, category_id=category_id)
 
 
 def get_by_id(id: int):
