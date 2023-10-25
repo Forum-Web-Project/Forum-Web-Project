@@ -53,7 +53,7 @@ def create_topic(title: str, text: str, users_id: int, categories_id: int) -> To
 
 def get_by_id(id: int):
     data = read_query(
-        '''SELECT id, title, text, users_id
+        '''SELECT id, title, text, users_id, categories_id
             FROM topics 
             WHERE id = ?''', (id,))
 

@@ -43,12 +43,13 @@ class Topic(BaseModel):
     
 class Category(BaseModel):
     name: str
-    is_private: str
-    
+
+    topics: list = []
+
     
     @classmethod
-    def from_query_result(cls, id, name, is_private):
+    def from_query_result(cls, id, name, topics=None):
         return cls(
             id=id,
             name=name,
-            is_private=is_private)
+            topics=topics or [])

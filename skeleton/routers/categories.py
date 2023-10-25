@@ -18,3 +18,14 @@ def get_categories(
         return category_service.sort(result, reverse=sort == 'desc')
     else:
         return result
+
+
+
+@category_router.get('/{id}')
+def get_category_by_id(id: int):
+    category = category_service.get_by_id(id)
+
+    if category is None:
+        return NotFound()
+    else:
+        return category
