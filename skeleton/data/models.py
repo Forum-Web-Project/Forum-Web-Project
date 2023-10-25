@@ -32,24 +32,38 @@ class Topic(BaseModel):
     username: str
     category_id: int
     
-    # @classmethod
-    # def from_query_result(cls, id, title, text, users_id, categories_id):
-    #     return cls(
-    #         id=id,
-    #         title=title,
-    #         text=text,
-    #         users_id=users_id,
-    #         categories_id=categories_id)
+    @classmethod
+    def from_query_result(cls, id, title, text, users_id, categories_id):
+        return cls(
+            id=id,
+            title=title,
+            text=text,
+            users_id=users_id,
+            categories_id=categories_id)
 
-class Category(BaseModel):
+class AllCategories(BaseModel):
+    id: int
     name: str
+    is_private: str
 
+    @classmethod
+    def from_query_result(cls, id, name, is_private):
+        return cls(
+            id=id,
+            name=name,
+            is_private=is_private)
+    
+class CategoryByID(BaseModel):
+    id: int
+    name: str
+    is_private: str
     topics: list = []
 
     
     @classmethod
-    def from_query_result(cls, id, name, topics=None):
+    def from_query_result(cls, id, name, is_private, topics=None):
         return cls(
             id=id,
             name=name,
+            is_private=is_private,
             topics=topics or [])
