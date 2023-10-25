@@ -13,6 +13,19 @@ def check_topic_exist(title:str) -> bool:
 
     return bool(data)
 
+
+
+def sort(topics: list[Topic], *, attribute='users_id', reverse=False):
+    if attribute == 'users_id':
+        def sort_fn(t: Topic): return t.users_id
+    elif attribute == 'category_id':
+        def sort_fn(t: Topic): return t.category_id
+    else:
+        def sort_fn(t: Topic): return t.id
+
+    return sorted(topics, key=sort_fn, reverse=reverse)
+
+
 def all(search: str = None):
     if search is None:
         data = read_query(
