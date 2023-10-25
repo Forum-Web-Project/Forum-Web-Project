@@ -1,10 +1,11 @@
 from mariadb import connect
 from mariadb.connections import Connection
+from db_password import my_password
 
 def _get_connection() -> Connection:
     return connect(
         user='root',
-        password= "202018bby",
+        password= my_password,
         host='localhost',
         port=3306,
         database='web project'
