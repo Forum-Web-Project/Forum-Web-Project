@@ -40,3 +40,15 @@ class Topic(BaseModel):
             text=text,
             users_id=users_id,
             categories_id=categories_id)
+    
+class Category(BaseModel):
+    name: str
+    is_private: str
+    
+    
+    @classmethod
+    def from_query_result(cls, id, name, is_private):
+        return cls(
+            id=id,
+            name=name,
+            is_private=is_private)
