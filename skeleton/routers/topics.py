@@ -38,7 +38,7 @@ def create_topic(data: Topic, token: str = Header()):
         if topic_service.check_topic_exist(data.title):
             return Response(status_code=400, content=f'Topic with this name exist!')
         else:
-            topic = topic_service.create_topic(data.title, data.text, data.users_id)
+            topic = topic_service.create_topic(data.title, data.text, data.users_id, data.categories_id)
             return topic
     else:
         raise HTTPException(status_code=401)

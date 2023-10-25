@@ -41,14 +41,14 @@ def all(search: str = None):
 
 
 
-def create_topic(title: str, text: str, users_id: int) -> Topic | None:
+def create_topic(title: str, text: str, users_id: int, categories_id: int) -> Topic | None:
     # password = _hash_password(password)
 
         generated_id = insert_query(
-            'INSERT INTO topics(title, text, users_id) VALUES (?,?,?)',
-            (title, text, users_id))
+            'INSERT INTO topics(title, text, users_id, categories_id) VALUES (?,?,?,?)',
+            (title, text, users_id, categories_id))
 
-        return Topic(id=generated_id, title=title, text=text, users_id=users_id)
+        return Topic(id=generated_id, title=title, text=text, users_id=users_id, categories_id=categories_id)
 
 
 def get_by_id(id: int):
