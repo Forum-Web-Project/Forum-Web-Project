@@ -67,3 +67,18 @@ class CategoryByID(BaseModel):
             name=name,
             is_private=is_private,
             topics=topics or [])
+
+    
+class Message(BaseModel):
+    id: int
+    text: str | None
+    users_id: int
+    receiver_username: str
+
+    @classmethod
+    def from_query_result(cls, id, text, user_id, receiver_username):
+        return cls(
+            id=id,
+            text=text,
+            user_id=user_id,
+            receiver_username=receiver_username)
