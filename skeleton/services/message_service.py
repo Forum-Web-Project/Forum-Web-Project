@@ -18,9 +18,20 @@ def get_conversation_by_user_id():
 def create(message: Message) -> Message | None:
 
     generated_id = insert_query(
-        '''INSERT INTO messages(id, text, users_id, receiver_username) VALUES (?,?,?,?)''',
-        (message.id, message.text, message.users_id, message.receiver_username))
+        '''INSERT INTO messages(id, text, sender_id, receiver_username) VALUES (?,?,?,?)''',
+        (message.id, message.text, message.sender_id, message.receiver_username))
 
     message.id = generated_id
 
     return message
+
+
+def check_receiver_name(receiver_username: str) -> bool:
+    data = read_query(
+        '''SELECT username FROM users WHERE username = ?''',
+        (receiver_username,)
+    )
+
+    result = data
+
+    return bool(result)
