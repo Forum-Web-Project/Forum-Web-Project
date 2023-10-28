@@ -34,11 +34,13 @@ def check_topic_exists(title: str) -> bool:
 def create_topic(title: str, text: str, username: str, category_id: int) -> Topic| None:
     author_id = find_id_by_username(username)
     real_author_id = author_id[0][0]
+
     if not category_service.check_category_exists(category_id):
         return Response(status_code=400, content="No such category!")
+
     generated_id = insert_query(
-    'INSERT INTO topics(title, text, users_id, up_vote, down_vote, categories_id) VALUES (?,?,?,?,?,?)',
-    (title, text, real_author_id, 0, 0, category_id))
+        'INSERT INTO topics(title, text, users_id, up_vote, down_vote, categories_id) VALUES (?,?,?,?,?,?)',
+        (title, text, real_author_id, 0, 0, category_id))
 
     return Topic(title=title, text=text, username=username, category_id=category_id)
 
@@ -87,6 +89,7 @@ def sort_topics(requirement: str):
     data = read_query(f'SELECT * FROM topics ORDER BY {order_by}')
 
     return data
+
 
 def get_topics_by_category_id(id: int):
     data = read_query(

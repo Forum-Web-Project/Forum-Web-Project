@@ -9,7 +9,6 @@ def sort(categories: list[AllCategories], *, reverse=False):
     return sorted(categories, key=sort_fn, reverse=reverse)
 
 
-
 def all(search: str = None):
     if search is None:
         data = read_query(
@@ -39,11 +38,10 @@ def all(search: str = None):
 #         [TopicForCategory.from_query_result(*row) for row in topics_raw_data])
 
 def read_categories():
-
     data = read_query('SELECT * FROM categories')
 
-
     return data
+
 
 def check_category_exists(id: int):
     data = read_query(
@@ -53,6 +51,7 @@ def check_category_exists(id: int):
 
     return bool(data)
 
+
 def get_category_id_by_name(name: str):
     data = read_query(
         'SELECT id FROM categories WHERE name = ?',
@@ -60,12 +59,14 @@ def get_category_id_by_name(name: str):
     )
     return data[0][0]
 
+
 def get_category_name_by_id(id: int):
     data = read_query(
         'SELECT name FROM categories WHERE id = ?',
         (id,)
     )
     return data[0][0]
+
 
 def find_category_by_id(id: int):
     data = read_query(
@@ -76,7 +77,8 @@ def find_category_by_id(id: int):
         return data[0]
     else:
         return None
-    
+
+
 def read_category():
     data = read_query('SELECT * FROM categories')
     return data
