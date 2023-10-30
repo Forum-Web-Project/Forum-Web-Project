@@ -40,7 +40,15 @@ def get_category_by_name(name: str):
     if not category_data:
         return Response(status_code=400, content='No such category!')
 
-    category_dict = {
+    is_private = category_data[2]
+    if is_private == "1":
+        category_dict = {
+            "id": category_data[0],
+            "name": category_data[1],
+            "is_private": category_data[2]
+        }
+    else:
+        category_dict = {
             "id": category_data[0],
             "name": category_data[1],
             "is_private": category_data[2],
