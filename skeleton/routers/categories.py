@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Response, Header, HTTPException, Query
+from fastapi import APIRouter, Response, Header, HTTPException, Query, Depends
 from services import category_service, topic_service
 from common.responses import BadRequest, NotFound
+from data.models import User
+#from services.category_service import get_current_user
 
 
 category_router = APIRouter(prefix='/category', tags=['Categories'])
@@ -45,3 +47,21 @@ def get_category_by_name(name: str):
             "topics": topic_service.get_topics_by_category_id(category_data[0])
         }
     return category_dict
+
+
+@category_router.post("/create_category")
+def create_category(
+    name: str = Query(),
+    is_private: bool = Query(),
+    current_user_token: str = Header()
+):
+    category_service.check_user_role(current_user_token, "Admin")
+
+    if not name:
+        return BadRequest("Name is required!")
+
+    if category_service.check_category_exists(name):
+        return BadRequest("Category already exists!")
+
+    category = category_service.create_category(name, is_private)
+    return category

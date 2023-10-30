@@ -1,5 +1,7 @@
-from data.models import Topic, AllCategories, CategoryByID
+from data.models import Topic, AllCategories, CategoryByID, User
 from data.database import read_query, insert_query
+from fastapi import APIRouter, Response, Header, HTTPException, Query, Depends
+from services import user_service
 
 
 def sort(categories: list[AllCategories], *, reverse=False):
@@ -43,10 +45,10 @@ def read_categories():
     return data
 
 
-def check_category_exists(id: int):
+def check_category_exists(name: str):
     data = read_query(
-        'SELECT id FROM categories WHERE id = ?',
-        (id,)
+        'SELECT name FROM categories WHERE name = ?',
+        (name,)
     )
 
     return bool(data)
@@ -100,3 +102,20 @@ def sort_categories(requirement: str):
         order_by = 'name DESC'
     data = read_query(f'SELECT * FROM categories ORDER BY {order_by}')
     return data
+
+
+def create_category(name: str, is_private: bool) -> AllCategories | None:
+    generated_id = insert_query(
+        'INSERT INTO categories(name, is_private) VALUES (?,?)',
+        (name, is_private))
+
+    return AllCategories(id=generated_id, name=name, is_private=is_private)
+
+
+def check_user_role(token: str, role: str = "Admin"):
+    # Validate the token and retrieve the user
+    user = user_service.from_token(token)
+
+    # Check if the user has the required role
+    if user.role != role:
+        raise HTTPException(status_code=401, detail=f"Only {role}s can perform this action")

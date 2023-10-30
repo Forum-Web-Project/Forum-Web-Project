@@ -44,7 +44,7 @@ class Topic(BaseModel):
 class AllCategories(BaseModel):
     id: int
     name: str
-    is_private: str
+    is_private: bool
 
     @classmethod
     def from_query_result(cls, id, name, is_private):
