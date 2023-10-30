@@ -1,7 +1,9 @@
 from data.models import Topic, AllCategories, CategoryByID, User
-from data.database import read_query, insert_query
+from data.database import read_query, insert_query, update_query
 from fastapi import APIRouter, Response, Header, HTTPException, Query, Depends
 from services import user_service
+from data.models import AllCategories
+from sqlalchemy.orm import Session
 
 
 def sort(categories: list[AllCategories], *, reverse=False):
@@ -119,3 +121,22 @@ def check_user_role(token: str, role: str = "Admin"):
     # Check if the user has the required role
     if user.role != role:
         raise HTTPException(status_code=401, detail=f"Only {role}s can perform this action")
+
+
+def get_categoryby_id(category_id: int) -> AllCategories | None:
+    category_raw_data = read_query(
+        'SELECT id, name, is_private FROM categories WHERE id = ?', (category_id,))
+
+    if not category_raw_data:
+        return None
+
+    category = AllCategories.from_query_result(*category_raw_data[0])
+    return category
+
+
+def update_category_privacy(category_id: int, is_private: bool):
+    category = get_categoryby_id(category_id)
+
+    category.is_private = is_private
+    update_query('UPDATE categories SET is_private = ? WHERE id = ?', (is_private, category_id))
+    return category

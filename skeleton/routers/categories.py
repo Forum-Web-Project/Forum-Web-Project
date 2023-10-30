@@ -65,3 +65,24 @@ def create_category(
 
     category = category_service.create_category(name, is_private)
     return category
+
+
+@category_router.put("/{name}/private", description="Make Category Private / Non-private")
+def make_category_private(
+    name: str,
+    is_private: bool = Query(),
+    current_user_token: str = Header()
+):
+    category_service.check_user_role(current_user_token, "Admin")
+
+    id = category_service.get_category_id_by_name(name)
+    category_data = category_service.find_category_by_id(id)
+
+    if not category_data:
+        return Response(status_code=400, content='No such category!')
+
+    category_service.update_category_privacy(id, is_private)
+    # topic_service.update_topic_privacy_by_category_id(id, is_private)
+
+    return {"message": f"Category {name} is now {'private' if is_private else 'public'}."}
+
