@@ -55,6 +55,14 @@ def check_category_exists(name: str):
 
     return bool(data)
 
+def check_category_exists_for_topic(id: int):
+    data = read_query(
+        'SELECT id FROM categories WHERE id = ?',
+        (id,)
+    )
+
+    return bool(data)
+
 
 def get_category_id_by_name(name: str):
     data = read_query(
