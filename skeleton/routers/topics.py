@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, Header, HTTPException, Query
-from services import user_service, topic_service, category_service
+from services import user_service, topic_service, category_service, reply_service
 from data.models import Topic
 from common.responses import BadRequest, NotFound
 from common.auth import get_user_or_raise_401
@@ -49,7 +49,8 @@ def get_topic_by_id(id: int):
             "username": user_service.find_username_by_id(topic_data[3]),
             "up_vote": topic_data[4],
             "down_vote": topic_data[5],
-            "category_name": category_service.get_category_name_by_id(topic_data[6])
+            "category_name": category_service.get_category_name_by_id(topic_data[6]),
+            "replies": reply_service.get_reply_by_topic_id(topic_data[0])
         }
     return topic_dict
     

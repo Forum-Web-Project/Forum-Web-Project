@@ -82,3 +82,8 @@ class Message(BaseModel):
             text=text,
             user_id=user_id,
             receiver_username=receiver_username)
+    
+class Reply(BaseModel):
+    text: str
+    username: str
+    topic_name: str

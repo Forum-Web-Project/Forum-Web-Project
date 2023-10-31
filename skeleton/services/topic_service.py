@@ -98,3 +98,10 @@ def get_topics_by_category_id(id: int):
     )
     topics = [{'title': row[1], 'text': row[2], 'users_id': row[3], 'up_vote': row[4], 'down_vote': row[5], 'categories_id': row[6]} for row in data]
     return {"category": category_service.get_category_name_by_id(id), "topics": topics}
+
+def get_topics_id_by_title(title_search: str):
+    data = read_query(
+        'SELECT id FROM topics WHERE title LIKE ?',
+        (f"%{title_search}%",)
+    )
+    return data[0][0]
