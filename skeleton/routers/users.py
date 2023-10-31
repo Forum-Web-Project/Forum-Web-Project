@@ -20,12 +20,13 @@ def login(username: str = Query(), password: str = Query()):
 def register(username: str = Query(),
              password: str = Query(),
              email: str = Query(),
-             role: str = Query(default="User")):
-    if role not in ["User", "Admin"]:
-        return Response(status_code=400, content=f'Invalid role!')
+             # role: str = Query(default="User")
+             ):
+    # if role not in ["User", "Admin"]:
+    #     return Response(status_code=400, content=f'Invalid role!')
 
     if user_service.check_username_exist(username):
         return Response(status_code=400, content=f'Username is already taken!')
     else:
-        user = user_service.create_user(username, password, email, role)
+        user = user_service.create_user(username, password, email)
         return user

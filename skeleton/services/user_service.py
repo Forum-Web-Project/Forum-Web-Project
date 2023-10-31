@@ -30,14 +30,14 @@ def find_by_username(nickname: str) -> User | None:
 
     return next((User.from_query_result(*row) for row in data), None)
 
-def create_user(username: str, password: str, email: str, role: str) -> User | None:
+def create_user(username: str, password: str, email: str) -> User | None:
     # password = _hash_password(password)
-
+        ROLE = "User"
         generated_id = insert_query(
             'INSERT INTO users(username, password, email, role) VALUES (?,?,?,?)',
-            (username, password, email, role))
+            (username, password, email, ROLE))
 
-        return User(id=generated_id, username=username, password="", email=email, role=role)
+        return User(id=generated_id, username=username, password="", email=email, role=ROLE)
 
 def check_username_exist(nickname:str) -> bool:
 
