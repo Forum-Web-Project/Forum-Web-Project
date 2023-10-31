@@ -72,15 +72,15 @@ class CategoryByID(BaseModel):
 class Message(BaseModel):
     id: int
     text: str | None
-    users_id: int
+    sender_id: int
     receiver_username: str
 
     @classmethod
-    def from_query_result(cls, id, text, user_id, receiver_username):
+    def from_query_result(cls, id, text, sender_id, receiver_username):
         return cls(
             id=id,
             text=text,
-            user_id=user_id,
+            sender_id=sender_id,
             receiver_username=receiver_username)
     
 class Reply(BaseModel):
