@@ -45,13 +45,15 @@ class AllCategories(BaseModel):
     id: int
     name: str
     is_private: bool
+    read_access_users: list = []
 
     @classmethod
-    def from_query_result(cls, id, name, is_private):
+    def from_query_result(cls, id, name, is_private, read_access_users=None):
         return cls(
             id=id,
             name=name,
-            is_private=is_private)
+            is_private=is_private,
+            read_access_users=read_access_users or [])
     
 class CategoryByID(BaseModel):
     id: int
