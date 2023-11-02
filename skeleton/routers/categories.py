@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response, Header, HTTPException, Query, Depends
-from services import category_service, topic_service
+from services import category_service, topic_service, user_service
 from common.responses import BadRequest, NotFound
 from data.models import User
 #from services.category_service import get_current_user
@@ -93,4 +93,42 @@ def make_category_private(
     # topic_service.update_topic_privacy_by_category_id(id, is_private)
 
     return {"message": f"Category {name} is now {'private' if is_private else 'public'}."}
+
+
+
+@category_router.get('/{id}/have_read_access', description='Get All Users That Have Read Access To A Specific Category')
+def read_access_users(id: int):
+    data = category_service.get_read_access_users(id)
+    return data[0]
+
+
+
+@category_router.put("/{name}/read_access", description="Give Read Access to a Specific Category and Specific User")
+def give_read_access_to_category(
+    name: str,
+    user_id: int,
+    current_user_token: str = Header()
+):
+    category_service.check_user_role(current_user_token, "Admin")
+
+    category_id = category_service.get_category_id_by_name(name)
+    category_data = category_service.find_category_by_id(category_id)
+    is_private = category_data[2]
+
+    if not category_data:
+        return Response(status_code=400, content='No such category!')
+
+    user_data = user_service.find_user_by_id(user_id)
+
+    if not user_data:
+        return Response(status_code=400, content='No such user!')
+
+    if is_private == "0":
+        return Response(status_code=400, content='Category is not private! No need to give read access to users!')
+    
+    category_service.give_read_access_to_category(category_id, user_id)
+
+    return {"message": f"User {user_data.username} now has read access to category {name}."}
+
+
 
