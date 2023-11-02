@@ -4,6 +4,9 @@ from fastapi import APIRouter, Response, Header, HTTPException, Query, Depends
 from services import user_service
 from data.models import AllCategories
 from sqlalchemy.orm import Session
+import json
+import re
+
 
 
 def sort(categories: list[AllCategories], *, reverse=False):
@@ -122,6 +125,25 @@ def create_category(name: str, is_private: bool) -> AllCategories | None:
     return AllCategories(id=generated_id, name=name, is_private=is_private)
 
 
+def get_read_access_users(category_id: int):
+    data = read_query(
+        'SELECT read_access_users FROM categories WHERE id = ?',
+        (category_id,)
+    )
+
+    if data[0][0] == None:
+        return None
+    
+    pattern = r'[A-Za-z0-9]+'
+
+    usernames = []
+    for i in data[0]:
+        name = re.findall(pattern, i)
+        usernames.append(name)
+
+    return usernames
+
+
 def check_user_role(token: str, role: str = "Admin"):
     # Validate the token and retrieve the user
     user = user_service.from_token(token)
@@ -148,3 +170,38 @@ def update_category_privacy(category_id: int, is_private: bool):
     category.is_private = is_private
     update_query('UPDATE categories SET is_private = ? WHERE id = ?', (is_private, category_id))
     return category
+
+
+def give_read_access_to_category(category_id: int, user_id: int):
+    category = get_categoryby_id(category_id)    
+    user = user_service.find_user_by_id(user_id)   
+
+    if not category:
+        raise ValueError(f"No category found with id {category_id}")
+    if not user:
+        raise ValueError(f"No user found with id {user_id}")
+
+
+    category.read_access_users.append(user.username)
+
+    read_access_users_json = json.dumps(category.read_access_users)
+
+    update_query("UPDATE categories SET read_access_users = CASE WHEN read_access_users IS NULL OR JSON_UNQUOTE(read_access_users) = '[]' THEN JSON_ARRAY(?) ELSE JSON_ARRAY_APPEND(read_access_users, '$', ?) END WHERE id = ?;", (read_access_users_json, read_access_users_json, category_id))
+    
+    
+def get_all_from_categoryby_id(category_id: int) -> AllCategories | None:
+    category_raw_data = read_query(
+        'SELECT * FROM categories WHERE id = ?', (category_id,))
+
+    if not category_raw_data:
+        return None
+
+    category = AllCategories.from_query_result(*category_raw_data[0])
+    return category
+
+
+def is_category_private(id: str) -> bool:
+    category = find_category_by_id(id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return category.is_private
