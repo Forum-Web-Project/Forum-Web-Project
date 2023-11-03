@@ -2,45 +2,46 @@ from data.database import read_query, insert_query
 from data.models import Message
 
 
+def conversation_by_username(sender_id: int, receiver_username: str = None):
+
+    data = read_query(
+        '''SELECT text FROM messages 
+            WHERE sender_id = ? AND receiver_username LIKE ?''',
+        (sender_id, receiver_username))
+
+    messages = [row[0] for row in data if row[0]]
+
+    return messages
+
+
 def all_user_related_message(id: int):
     data = read_query(
-        '''SELECT id, text, sender_id, receiver_username FROM messages WHERE sender_id = ?''',
+        '''SELECT DISTINCT receiver_username 
+            FROM messages 
+            WHERE sender_id = ?''',
         (id,))
 
-    if not data:
-        return None
+    usernames = [row[0] for row in data if row[0]]
 
-    return (Message.from_query_result(*row) for row in data)
-
-
-def conversation_by_username(name: str = None):
-
-    data = read_query(
-        '''SELECT id, text, sender_id, receiver_username
-           FROM messages 
-           WHERE receiver_username LIKE ?''', (name,))
-
-    return (Message.from_query_result(*row) for row in data)
+    return usernames
 
 
-def create(message: Message) -> Message | None:
-
+def create(text: str, sender_id: int, receiver_username: str) -> Message | None:
     generated_id = insert_query(
-        '''INSERT INTO messages(id, text, sender_id, receiver_username) VALUES (?,?,?,?)''',
-        (message.id, message.text, message.sender_id, message.receiver_username))
+        '''INSERT INTO messages(text, sender_id, receiver_username) 
+            VALUES (?,?,?)''',
+        (text, sender_id, receiver_username))
 
-    message.id = generated_id
-
-    return message
+    return Message(id=generated_id, text=text, sender_id=sender_id, receiver_username=receiver_username)
 
 
 def check_receiver_name(receiver_username: str) -> bool:
     data = read_query(
-        '''SELECT username FROM users WHERE username = ?''',
-        (receiver_username,)
-    )
+        '''SELECT username 
+            FROM users 
+            WHERE username = ?''',
+        (receiver_username,))
 
     result = data
 
     return bool(result)
-
