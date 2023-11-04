@@ -35,7 +35,7 @@ def get_topics(
     return result
 
 
-@topics_router.get('/{id}')
+@topics_router.get('/{id}', description="Get topic by ID")
 def get_topic_by_id(id: int):
     topic_data = topic_service.find_topic_by_id(id)
 
@@ -55,7 +55,7 @@ def get_topic_by_id(id: int):
     return topic_dict
     
 
-@topics_router.post("/create_topic")
+@topics_router.post("/", description="Creates a topic")
 def create_topic(x_token: str = Header(),
                 title: str  = Query(), 
                 text: str = Query(),

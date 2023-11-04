@@ -57,7 +57,7 @@ def get_category_by_name(name: str):
     return category_dict
 
 
-@category_router.post("/create_category")
+@category_router.post("/", description="Creates a category")
 def create_category(
     name: str = Query(),
     is_private: bool = Query(),
@@ -75,7 +75,7 @@ def create_category(
     return category
 
 
-@category_router.put("/{name}/private", description="Make Category Private / Non-private")
+@category_router.put("/private/{name}", description="Make Category Private / Non-private")
 def make_category_private(
     name: str,
     is_private: bool = Query(),
@@ -96,14 +96,14 @@ def make_category_private(
 
 
 
-@category_router.get('/{id}/have_read_access', description='Get All Users That Have Read Access To A Specific Category')
+@category_router.get('/{id}', description='Get All Users That Have Read Access To A Specific Category')
 def read_access_users(id: int):
     data = category_service.get_read_access_users(id)
     return data[0]
 
 
 
-@category_router.put("/{name}/read_access", description="Give Read Access to a Specific Category and Specific User")
+@category_router.put("/{name}", description="Give Read Access to a Specific Category and Specific User")
 def give_read_access_to_category(
     name: str,
     user_id: int,

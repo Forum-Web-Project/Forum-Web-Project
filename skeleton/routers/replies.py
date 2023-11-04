@@ -25,7 +25,7 @@ def get_replies():
     return result
 
 
-@reply_router.post("/create_reply")
+@reply_router.post("/", description="Creates a reply for a certain topic")
 def create_reply(x_token: str = Header(),
                 text: str  = Query(), 
                 topic_name: str = Query(),
@@ -40,10 +40,9 @@ def create_reply(x_token: str = Header(),
         return result
 
 
-@reply_router.put("/upvote_reply")
-def upvote_reply(x_token: str = Header(),
-                 reply_id: int = Query()
-                 ):
+
+@reply_router.put("/{reply_id}/upvote", description="Upvote a reply")
+def upvote_reply(reply_id: int, x_token: str = Header()):
     user = get_user_or_raise_401(x_token)
     user_id, _ = x_token.split(_SEPARATOR)
 
@@ -51,10 +50,6 @@ def upvote_reply(x_token: str = Header(),
         return JSONResponse(status_code=400, content=f'You already upvoted this reply!')
     
     if reply_service.check_if_already_downvoted(user_id, reply_id):
-        # reply_service.remove_downvote_from_reply(reply_id)
-        # reply_service.add_upvote_to_reactions(user_id, reply_id)
-        # result = reply_service.upvote_reply(reply_id)
-        # return result
         reply_service.remove_downvote_from_reply(reply_id)
         reply_service.set_reaction_to_one(user_id, reply_id)
         reply_service.upvote_reply(reply_id)
@@ -66,13 +61,12 @@ def upvote_reply(x_token: str = Header(),
         reply_service.upvote_reply(reply_id)
         reply_service.add_upvote_to_reactions(user_id, reply_id)
         return JSONResponse(status_code=200, content=f'Upvote complete!')
+
     
 
 
-@reply_router.put("/downvote_reply")
-def downvote_reply(x_token: str = Header(),
-                 reply_id: int = Query()
-                 ):
+@reply_router.put("/{reply_id}/downvote", description="Downvote a reply")
+def downvote_reply(reply_id: int, x_token: str = Header()):
     user = get_user_or_raise_401(x_token)
     user_id, _ = x_token.split(_SEPARATOR)
 
@@ -80,13 +74,10 @@ def downvote_reply(x_token: str = Header(),
         return JSONResponse(status_code=400, content=f'You already downvoted this reply!')
     
     if reply_service.check_if_already_upvoted(user_id, reply_id):
-        # reply_service.remove_upvote_from_reply(reply_id)
-        # reply_service.add_downvote_to_reactions(user_id, reply_id)
         reply_service.remove_upvote_from_reply(reply_id)
         reply_service.set_reaction_to_zero(user_id, reply_id)
         reply_service.downvote_reply(reply_id)
         return JSONResponse(status_code=200, content=f'Downvote complete!')
-
 
     if not reply_service.check_reply_exists_by_id(reply_id):
         return JSONResponse(status_code=400, content=f'Wrong ID, no such reply!')
