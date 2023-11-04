@@ -72,7 +72,10 @@ def get_category_id_by_name(name: str):
         'SELECT id FROM categories WHERE name = ?',
         (name,)
     )
-    return data[0][0]
+    if data:
+        return data[0][0]
+    else:
+        return None
 
 
 def get_category_name_by_id(id: int):

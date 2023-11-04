@@ -8,7 +8,7 @@ message_router = APIRouter(prefix='/message', tags=['Messages'])
 
 
 # -	Responds with a list of Messages exchanged between the authenticated user and another user
-@message_router.get('/receiver_username', description="Get all user related message by username")  # response_model=list[Message]
+@message_router.get('/messages', description="Get all user related message by username")  # response_model=list[Message]
 def get_conversation_by_username(receiver_username: str, x_token: str = Header()):
     user = get_user_or_raise_401(x_token)
 
@@ -25,7 +25,7 @@ def get_conversation_by_username(receiver_username: str, x_token: str = Header()
 
 
 # - Responds with a list of all Users with which the authenticated user has exchanged messages
-@message_router.get('/', description="Get all related user users by id")  # response_model=list[Message]
+@message_router.get('/conversations', description="Get all related user users by id")  # response_model=list[Message]
 def get_conversations(x_token: str = Header()):
     user = get_user_or_raise_401(x_token)
 

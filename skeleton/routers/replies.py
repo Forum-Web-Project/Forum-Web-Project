@@ -35,7 +35,7 @@ def create_reply(x_token: str = Header(),
     is_best_reply = False
 
     if reply_service.check_reply_exists(text):
-        return Response(status_code=400, content=f'Such reply already exists!')
+        return JSONResponse(status_code=400, content=f'Such reply already exists!')
     else:
         result = reply_service.create_reply(text, username, topic_name, is_best_reply)
         return result

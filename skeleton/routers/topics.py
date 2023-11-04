@@ -41,7 +41,7 @@ def get_topic_by_id(id: int):
     topic_data = topic_service.find_topic_by_id(id)
 
     if not topic_data:
-        return Response(status_code=400, content='No such topic!')
+        return JSONResponse(status_code=400, content='No such topic!')
 
     topic_dict = {
             "id": topic_data[0],
@@ -68,7 +68,7 @@ def create_topic(x_token: str = Header(),
     category_id = category_service.get_category_id_by_name(category_name)
 
     if topic_service.check_topic_exists(title):
-        return Response(status_code=400, content=f'Topic with such title already exists!')
+        return JSONResponse(status_code=400, content=f'Topic with such title already exists!')
     else:
         result = topic_service.create_topic(title, text, username, category_id)
         return result
@@ -76,17 +76,13 @@ def create_topic(x_token: str = Header(),
 
 @topics_router.put('/{topic_id}', description='Only the author of the topic can update this!')
 def choose_best_reply(topic_id: int, reply_id: int, x_token: str = Header()):
-
     user = get_user_or_raise_401(x_token)
-
     logged_user_id = user_service.get_id_from_token(x_token)
-
+    
     if not topic_service.find_topic_by_id(topic_id):
         return JSONResponse(status_code=400, content='No such topic found!')
-    
     if not reply_service.check_reply_exists_by_id(reply_id):
         return JSONResponse(status_code=400, content='No such reply found!')
-
     if topic_service.check_if_user_is_owner(logged_user_id, topic_id):
         return topic_service.choose_best_reply(reply_id,topic_id)
     else:

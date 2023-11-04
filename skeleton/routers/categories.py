@@ -3,6 +3,7 @@ from services import category_service, topic_service, user_service
 from common.responses import BadRequest, NotFound
 from data.models import User
 #from services.category_service import get_current_user
+from fastapi.responses import JSONResponse
 
 
 category_router = APIRouter(prefix='/category', tags=['Categories'])
@@ -38,7 +39,7 @@ def get_category_by_name(name: str):
     category_data = category_service.find_category_by_id(id)
 
     if not category_data:
-        return Response(status_code=400, content='No such category!')
+        return JSONResponse(status_code=400, content='No such category!')
 
     is_private = category_data[2]
     if is_private == "1":
@@ -69,7 +70,7 @@ def create_category(
         return BadRequest("Name is required!")
 
     if category_service.check_category_exists(name):
-        return BadRequest("Category already exists!")
+        return JSONResponse(status_code=400, content="Category already exists!")
 
     category = category_service.create_category(name, is_private)
     return category
@@ -87,7 +88,7 @@ def make_category_private(
     category_data = category_service.find_category_by_id(id)
 
     if not category_data:
-        return Response(status_code=400, content='No such category!')
+        return JSONResponse(status_code=400, content='No such category!')
 
     category_service.update_category_privacy(id, is_private)
     # topic_service.update_topic_privacy_by_category_id(id, is_private)
@@ -116,15 +117,15 @@ def give_read_access_to_category(
     is_private = category_data[2]
 
     if not category_data:
-        return Response(status_code=400, content='No such category!')
+        return JSONResponse(status_code=400, content='No such category!')
 
     user_data = user_service.find_user_by_id(user_id)
 
     if not user_data:
-        return Response(status_code=400, content='No such user!')
+        return JSONResponse(status_code=400, content='No such user!')
 
     if is_private == "0":
-        return Response(status_code=400, content='Category is not private! No need to give read access to users!')
+        return JSONResponse(status_code=400, content='Category is not private! No need to give read access to users!')
     
     category_service.give_read_access_to_category(category_id, user_id)
 

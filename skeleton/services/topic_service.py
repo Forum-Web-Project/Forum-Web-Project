@@ -37,7 +37,7 @@ def create_topic(title: str, text: str, username: str, category_id: int) -> Topi
     real_author_id = author_id[0][0]
 
     if not category_service.check_category_exists_for_topic(category_id):
-        return Response(status_code=400, content="No such category!")
+        return JSONResponse(status_code=400, content="No such category!")
 
     generated_id = insert_query(
         'INSERT INTO topics(title, text, users_id, up_vote, down_vote, categories_id) VALUES (?,?,?,?,?,?)',
