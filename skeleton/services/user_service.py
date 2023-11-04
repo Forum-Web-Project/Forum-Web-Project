@@ -59,3 +59,8 @@ def find_username_by_id(id: int):
           (id,)
     )
      return data[0][0]
+
+def get_id_from_token(token: str) -> User | None:
+    id, _ = token.split(_SEPARATOR)
+
+    return id

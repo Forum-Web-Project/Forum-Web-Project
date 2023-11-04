@@ -3,6 +3,7 @@ from services import user_service, topic_service, category_service, reply_servic
 from data.models import Topic
 from common.responses import BadRequest, NotFound
 from common.auth import get_user_or_raise_401
+from fastapi.responses import JSONResponse
 
 
 topics_router = APIRouter(prefix='/topic', tags=['Topic'])
@@ -50,6 +51,7 @@ def get_topic_by_id(id: int):
             "up_vote": topic_data[4],
             "down_vote": topic_data[5],
             "category_name": category_service.get_category_name_by_id(topic_data[6]),
+            "best_reply": reply_service.get_best_reply(topic_data[0]),
             "replies": reply_service.get_reply_by_topic_id(topic_data[0])
         }
     return topic_dict
@@ -70,3 +72,22 @@ def create_topic(x_token: str = Header(),
     else:
         result = topic_service.create_topic(title, text, username, category_id)
         return result
+    
+
+@topics_router.put('/{topic_id}', description='Only the author of the topic can update this!')
+def choose_best_reply(topic_id: int, reply_id: int, x_token: str = Header()):
+
+    user = get_user_or_raise_401(x_token)
+
+    logged_user_id = user_service.get_id_from_token(x_token)
+
+    if not topic_service.find_topic_by_id(topic_id):
+        return JSONResponse(status_code=400, content='No such topic found!')
+    
+    if not reply_service.check_reply_exists_by_id(reply_id):
+        return JSONResponse(status_code=400, content='No such reply found!')
+
+    if topic_service.check_if_user_is_owner(logged_user_id, topic_id):
+        return topic_service.choose_best_reply(reply_id,topic_id)
+    else:
+        return JSONResponse(status_code=400, content='You are not the owner of this topic!')

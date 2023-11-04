@@ -1,7 +1,8 @@
-from data.database import read_query,insert_query
+from data.database import read_query,insert_query,update_query
 from data.models import Topic
 from services import category_service
 from fastapi import Response
+from fastapi.responses import JSONResponse
 
 
 def check_topic_exist(title:str) -> bool:
@@ -105,3 +106,19 @@ def get_topics_id_by_title(title_search: str):
         (f"%{title_search}%",)
     )
     return data[0][0]
+
+def check_if_user_is_owner(logged_user_id: int, topic_id: int):
+    check = read_query('SELECT * FROM topics WHERE id = ? AND users_id = ?', (topic_id, logged_user_id))
+    return bool(check)
+
+def choose_best_reply(reply_id,topic_id):
+    check = read_query(
+        "SELECT * FROM replies WHERE topics_id = ?",
+        (topic_id,)
+    )
+    if check:
+        update = update_query('UPDATE replies SET is_best_reply = 1 WHERE id = ? AND topics_id = ?', (reply_id, topic_id))
+        update_query('UPDATE replies SET is_best_reply = 0 WHERE id != ? AND topics_id = ?', (reply_id,topic_id))
+        return JSONResponse(status_code=200, content=f'Updated best reply for topic {topic_id}!')
+    else:
+        return JSONResponse(status_code=400, content="This reply does not belong to this topic!")

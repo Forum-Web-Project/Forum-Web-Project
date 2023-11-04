@@ -1,6 +1,6 @@
 from data.database import read_query,insert_query,update_query
 from data.models import Reply
-from services import topic_service
+from services import topic_service,user_service
 from fastapi import Response
 
 
@@ -12,7 +12,7 @@ def find_id_by_username(nickname):
     return result
 
 
-def create_reply(text: str, username: str, topic_name: str) -> Reply| None:
+def create_reply(text: str, username: str, topic_name: str, is_best_reply) -> Reply| None:
     author_id = find_id_by_username(username)
     real_author_id = author_id[0][0]
 
@@ -22,10 +22,10 @@ def create_reply(text: str, username: str, topic_name: str) -> Reply| None:
     topic_id = topic_service.get_topics_id_by_title(topic_name)
 
     generated_id = insert_query(
-        'INSERT INTO replies(text, users_id, topics_id, upvotes, downvotes) VALUES (?,?,?,?,?)',
-        (text, real_author_id, topic_id, 0, 0))
+        'INSERT INTO replies(text, users_id, topics_id, is_best_reply, upvotes, downvotes) VALUES (?,?,?,?,?,?)',
+        (text, real_author_id, topic_id, is_best_reply, 0, 0))
 
-    return Reply(text=text, username=username, topic_name=topic_name)
+    return Reply(text=text, username=username, topic_name=topic_name, is_best_reply=is_best_reply)
 
 
 def check_reply_exists(text: str) -> bool:
@@ -125,3 +125,11 @@ def add_downvote_to_reactions(user_id, reply_id):
          (user_id, reply_id, 0,)
     )
     return data
+
+def get_best_reply(topic_id: int ):
+    data = read_query('SELECT * FROM replies WHERE topics_id = ? AND is_best_reply = 1 ORDER BY id DESC LIMIT 1', (topic_id,))
+    if data:
+        reply = [{'nickname': user_service.find_username_by_id(row[2]), 'reply_text': row[1]} for row in data]
+        return reply
+    else:
+        return None

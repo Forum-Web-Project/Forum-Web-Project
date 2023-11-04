@@ -32,11 +32,12 @@ def create_reply(x_token: str = Header(),
             ):
     user = get_user_or_raise_401(x_token)
     username = user_service.get_nickname_from_token(x_token)
+    is_best_reply = False
 
     if reply_service.check_reply_exists(text):
         return Response(status_code=400, content=f'Such reply already exists!')
     else:
-        result = reply_service.create_reply(text, username, topic_name)
+        result = reply_service.create_reply(text, username, topic_name, is_best_reply)
         return result
 
 
