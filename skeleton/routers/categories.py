@@ -96,14 +96,6 @@ def make_category_private(
     return {"message": f"Category {name} is now {'private' if is_private else 'public'}."}
 
 
-
-@category_router.get('/{id}', description='Get All Users That Have Read Access To A Specific Category')
-def read_access_users(id: int):
-    data = category_service.get_read_access_users(id)
-    return data[0]
-
-
-
 @category_router.put("/{name}", description="Give Read Access to a Specific Category and Specific User")
 def give_read_access_to_category(
     name: str,
@@ -132,4 +124,7 @@ def give_read_access_to_category(
     return {"message": f"User {user_data.username} now has read access to category {name}."}
 
 
-
+# @category_router.get('/{id}', description='Get All Users That Have Read Access To A Specific Category')
+# def read_access_users(id: int):
+#     data = category_service.get_read_access_users(id)
+#     return data[0]

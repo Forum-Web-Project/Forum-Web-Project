@@ -64,3 +64,10 @@ def get_id_from_token(token: str) -> User | None:
     id, _ = token.split(_SEPARATOR)
 
     return id
+
+def find_user_by_id(id: int) -> User | None:
+    data = read_query(
+        'SELECT * FROM users WHERE id = ?',
+        (id,))
+
+    return next((User.from_query_result(*row) for row in data), None)
